@@ -1,47 +1,57 @@
-## Welcome to My GitHub! 
+## Muskula Rahul
 
-Greetings! I’m **Muskula Rahul**, a tech enthusiast fueled by the perfect blend of curiosity, creativity, and strong coffee ☕️. I’m on a mission to turn complex challenges into simple, impactful solutions.
+![Profile Views](https://komarev.com/ghpvc/?username=iamrahulreddy&color=blueviolet&style=flat-square)
+[![Blog](https://img.shields.io/badge/Blog-neuralnets.dev-orange?style=flat-square&logo=astro)](https://neuralnets.dev)
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-iamrahulreddy-blue?style=flat-square&logo=linkedin)](https://www.linkedin.com/in/iamrahulreddy/)
+[![Hugging Face](https://img.shields.io/badge/🤗-HuggingFace-yellow?style=flat-square)](https://huggingface.co/iamrahulreddy)
 
-### 🌟 What I’m Passionate About
+I build LLM systems that sit close to the metal — MoE architectures, attention kernels, speculative decoding. The kind of work where a misaligned memory access costs you a day.
 
-My passions lie in the realms of **Machine Learning**, where I immerse myself in tools like **Google Cloud Platform** and **TensorFlow**, occasionally sparring with a particularly obstinate line of code.  
+> [!NOTE]
+> The workflow: read the paper, implement it, fix what broke. The CUDA race conditions weren't in the abstract.
 
-Beyond my dedication to **Machine Learning**, I’m actively exploring the dynamic fields of **IT Support** and **Cybersecurity**. These areas challenge me to stay adaptable, think critically, and refine my problem-solving skills - ensuring that no two days are ever the same.
+## Projects
 
-### 🎯 Beyond the Tech
+### [Keiro](https://huggingface.co/iamrahulreddy/Keiro) — Sparse MoE on Qwen2.5-3B
 
-When I’m not debugging code or exploring cloud infrastructure, you can often find me:  
+Retrofitted Sparse Mixture-of-Experts into Qwen2.5-3B. A Top-2 router activates 2 of 8 LoRA experts per transformer block, leaving the frozen FFN untouched and routing through Rank-16 adapters instead. Active compute stays identical to the dense baseline. The model adds **19.46M trainable parameters (0.63% of total)** and retains **95.4% of GSM8K** performance.
 
-- **Strategizing my next chess move** ♟️ because nothing beats the thrill of saying “checkmate.”
-- **Indulging in my unique debugging ritual**: serenading my code with my less-than-stellar singing voice 🎶 (trust me, it’s more effective than it sounds).  
-- **Curating memes**: I specialize in delightfully absurd creations, perfecting the fine balance between hilarity and cringe—think Boromir-level comedy gold.
+```
+What actually needed fixing:
+├── CUDA race condition in index_add_ with duplicate Top-K indices
+├── BFloat16 cumsum upcast mismatch in the coalesce path
+└── 4.7× autoregressive inference bottleneck — resolved by bypassing
+    capacity buffers during single-token generation
 
-### ✍️ Let’s Look at Some Code
-
-Here’s a quirky Python snippet that embodies my debugging philosophy: keep it fun, keep it productive:
-
-```python
-def debug_with_music(bug_count):
-    """Sing to your code and reduce bug count."""
-    print("🎵 Debugging with tunes... 🎶")
-    while bug_count > 0:
-        print(f"Fixing bug {bug_count}...🎤")
-        bug_count -= 1
-    print("✨ All bugs fixed! Time for a coffee break ☕️")
-
-# Give it a try
-debug_with_music(5)
+lm-evaluation-harness results vs. base model:
+├── HellaSwag     −0.13%
+├── ARC-Challenge −0.17%
+└── GSM8K         −3.19%
 ```
 
-This snippet is not just code; it’s a mindset—transforming challenges into melodies of progress.  
+### [Prolepsis](https://github.com/iamrahulreddy/Prolepsis) — Speculative Decoding
 
-### 🌐 Let’s Connect
+A Qwen 1.7B draft model generates candidate tokens; a Qwen 8B target verifies them in a single parallel pass. A rejection sampling pipeline ensures the output distribution is mathematically identical to running the target model alone.
 
-Whether it’s discussing Machine Learning intricacies, dissecting cybersecurity vulnerabilities, or debating the art of meme creation, I’d love to connect!  
+| Metric | Result |
+|---|---|
+| Speedup on A100 | **1.30×** |
+| Acceptance Rate | **~56.5%** across mixed-domain prompts |
+| Output Distribution | Identical to target |
 
-[LinkedIn Profile](https://www.linkedin.com/in/iamrahulreddy/)  
-[My Portfolio](https://neuralnets.dev)  
+### [FlashTile](https://github.com/iamrahulreddy/FlashTile) — Flash Attention V1/V2
 
-## Thank You!  
+Implements block-wise tiling, online softmax, and recomputation-based backward passes to cut attention storage from **O(N²) to O(N)**. Covers GQA and MQA variants, with a forward-only Triton kernel included for benchmarking.
 
-Thank you for visiting! May your code always compile smoothly 🔄, your coffee remain perpetually strong ☕️, and your memes achieve legendary status 😎.  
+### [Substrata9](https://github.com/iamrahulreddy/Substrata9) — Linux Introspection Toolkit
+
+Pure Bash. No compilation, no dependencies. Reads `/proc` to surface memory maps, file descriptors, process hierarchies, and runtime anomalies. Outputs JSON — slots into observability, debugging, and forensics pipelines without modification.
+
+### [Mission Cipher](https://github.com/iamrahulreddy/cipher) — GraphRAG App
+
+Combines cosine-similarity search over semantic embeddings with a live knowledge graph (NetworkX) to answer questions with richer contextual grounding than plain RAG. Deployed on GCE behind NGINX, with Flask and Gunicorn communicating over a Unix socket.
+
+## Writing
+
+> [!TIP]
+> [neuralnets.dev](https://neuralnets.dev) — LLM architecture, inference, GPU programming, and occasionally the math underneath all of it. The goal is precision over vibe — the writeups get into what the papers skip and what the code alone won't tell you.
